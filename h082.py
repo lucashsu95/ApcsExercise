@@ -1,53 +1,48 @@
-from typing import Any
+def main():
+    n, m = map(int, input().split())
 
+    s = [0] * (n + 1)
+    t = [0] * (n + 1)
+    lose = [0] * (n + 1)
 
-class Player:
-    def __init__(self,s,t,idx) -> None:
-        self.s = s
-        self.t = t
-        self.idx = idx
-        self.loseCount = 0
-    
-    def __str__(self) -> str:
-        return f"s: {self.s}, t: {self.t}, idx: {self.idx}, loseCount: {self.loseCount}"
+    for i in range(1, n + 1):
+        s[i] = int(input())  # 战力
 
-    def isDie(self):
-        if self.loseCount == m:
-            return True
-        return False
-    
-n,m = map(int,input().split())
-people = [list(map(int,input().split())) for _ in range(3)]
-peopleNum = len(people[0])
+    for i in range(1, n + 1):
+        t[i] = int(input())  # 应变力
 
-battle = [Player(people[0][i],people[1][i],people[2][i]) for i in range(peopleNum)]
-# battle.sort(key=lambda x:x.idx)
-while len(battle) != 1:
-    for i in range(1,len(battle),2):
-        p1 = battle[i - 1]
-        p2 = battle[i]
-        # print(p1,p2)
-        if p1.s * p1.t >= p2.s * p2.t:
-            s = p1.s
-            p1.s = int(p1.s + p2.s * p2.t / (2 * p1.t))
-            p1.t = int(p1.t + p2.s * p2.t / (2 * s))
-            p2.s += p2.s // 2
-            p2.t += p2.t // 2
-            p2.loseCount += 1
-        else:
-            s = p2.s
-            p2.s = int(p2.s + p1.s * p1.t / (2 * p2.t))
-            p2.t = int(p2.t + p1.s * p1.t / (2 * s))
-            p1.s += p1.s // 2
-            p1.t += p1.t // 2
-            p1.loseCount += 1
+    v = [int(input()) for _ in range(n)]  # 第一轮进行配对竞赛的玩家编号
+
+    while len(v) > 1:
+        v1, v2 = [], []
+        for i in range(0, len(v) - 1, 2):
+            x, y = v[i], v[i + 1]
+            a, b, c, d = s[x], t[x], s[y], t[y]
+            if a * b >= c * d:
+                s[x] += c * d // (2 * b)
+                t[x] += c * d // (2 * a)
+                s[y] += c // 2
+                t[y] += d // 2
+                v1.append(x)
+                lose[y] += 1
+                if lose[y] < m:
+                    v2.append(y)
+            else:
+                s[y] += a * b // (2 * d)
+                t[y] += a * b // (2 * c)
+                s[x] += a // 2
+                t[x] += b // 2
+                v1.append(y)
+                lose[x] += 1
+                if lose[x] < m:
+                    v2.append(x)
+
+        if len(v) % 2 == 1:
+            v1.append(v[-1])
         
+        v = v1 + v2
 
-    battle2 = []
-    for p in battle:
-        if not p.isDie():
-            battle2.append(p)
-        battle = battle2.copy()
+    print(v[0])
 
-for i in battle:
-    print(i)
+if __name__ == "__main__":
+    main()
